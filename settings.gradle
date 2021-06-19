@@ -1,2 +1,3 @@
 rootProject.name = "OurPlaces"
 include ':app'
+include ':sectionedrecyclerview'
