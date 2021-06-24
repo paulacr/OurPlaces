@@ -88,7 +88,11 @@ class BaseAdapter(
         BaseViewHolder<ListItem>(binding) {
 
         override fun bind(item: ListItem) {
-            binding.listItemTitle.text = item.title
+//            binding.itemImage.setime = item.imageRes
+            //glide
+
+            binding.itemTitle.text = item.title
+            binding.itemLocation.text = item.location
             binding.executePendingBindings()
         }
     }
