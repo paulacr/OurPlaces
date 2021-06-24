@@ -2,6 +2,19 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <TextView
+        android:id="@+id/headerTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/header_background"
+        android:paddingStart="@dimen/dimen_4dp"
+        android:paddingTop="@dimen/dimen_2dp"
+        android:paddingEnd="@dimen/dimen_4dp"
+        android:paddingBottom="@dimen/dimen_2dp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        tools:text="header title" />
+
     <data>
 
         <variable
@@ -9,11 +22,5 @@
             type="com.paulacr.sectionedrecyclerview.header.Header" />
 
     </data>
-
-    <TextView
-        android:id="@+id/headerTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="header title" />
 
 </layout>
