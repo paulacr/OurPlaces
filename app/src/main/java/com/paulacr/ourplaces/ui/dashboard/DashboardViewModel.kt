@@ -11,8 +11,8 @@ class DashboardViewModel : ViewModel() {
     private val itemsLiveData = MutableLiveData<List<ListItem>>().apply {
         value = listOf(
             ListItem("item 1", 0, ListItemType.RecentVisitedPlaces),
-            ListItem("item 2", 0, ListItemType.PlacesToVisit),
-            ListItem("item 3", 0, ListItemType.RecentVisitedPlaces),
+            ListItem("item 2", 0, ListItemType.RecentVisitedPlaces),
+            ListItem("item 3", 0, ListItemType.PlacesToVisit),
             ListItem("item 4", 0, ListItemType.PlacesToVisit)
         )
     }

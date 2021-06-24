@@ -8,7 +8,6 @@ import com.paulacr.sectionedrecyclerview.databinding.ItemHeaderBinding
 import com.paulacr.sectionedrecyclerview.databinding.ItemListBinding
 import com.paulacr.sectionedrecyclerview.header.Header
 import com.paulacr.sectionedrecyclerview.listitem.ListItem
-import com.paulacr.sectionedrecyclerview.listitem.ListItemType
 
 const val VIEW_TYPE_HEADER = 0
 const val VIEW_TYPE_ITEM = 1
@@ -19,20 +18,24 @@ class BaseAdapter(
 ) :
     RecyclerView.Adapter<BaseViewHolder<*>>() {
 
-    private val recentVisitedItems: List<ListItem> = items.filter {
-        it.listItemType == ListItemType.RecentVisitedPlaces
-    }.toMutableList()
+    data class ListItemWithHeader(val listItem: ListItem, val isHeader: Boolean? = false)
 
-    private val placesToVisitItems = items.filter {
-        it.listItemType == ListItemType.PlacesToVisit
-    }.toMutableList()
+    private val newList: MutableList<ListItemWithHeader> = mutableListOf()
 
-    private val newList = mutableListOf(
-        listOf(ListItem()),
-        recentVisitedItems,
-        listOf(ListItem()),
-        placesToVisitItems).flatten()
+    init {
+        setupList()
+    }
 
+    private fun setupList() {
+        items.groupBy {
+            it.listItemType
+        }.onEach {
+            newList.add(ListItemWithHeader(ListItem(listItemType = it.key), true))
+            it.value.map { listItem ->
+                newList.add(ListItemWithHeader(listItem))
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): BaseViewHolder<*> {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -46,35 +49,29 @@ class BaseAdapter(
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
-        println("adapter newList -> $newList")
-        val item = newList.toMutableList()[position]
+        val item = newList[position]
+
         if (getItemViewType(position) == VIEW_TYPE_HEADER) {
-            (holder as HeaderViewHolder).bind(item.listItemType.header)
+            item.listItem.listItemType.header?.let { (holder as HeaderViewHolder).bind(it) }
         } else {
             (holder as ListItemViewHolder).apply {
                 itemView.setOnClickListener {
-                    clickListener(item)
+                    item.listItem.let {  listItem ->
+                        clickListener(listItem)
+                    }
                 }
-            }.bind(item)
+            }.bind(item.listItem)
         }
     }
 
-    override fun getItemCount(): Int {
-        return newList.size
-    }
-
+    override fun getItemCount(): Int = newList.size
 
     override fun getItemViewType(position: Int): Int {
 
-        val positionPlacesToVisit = newList.indexOfFirst {
-            it.listItemType == ListItemType.PlacesToVisit
-        }
-
-        return when (position) {
-            0 -> VIEW_TYPE_HEADER
-            in 1..positionPlacesToVisit -> VIEW_TYPE_ITEM
-            positionPlacesToVisit + 1 -> VIEW_TYPE_HEADER
-            else -> VIEW_TYPE_ITEM
+        return if (newList[position].isHeader == true) {
+            VIEW_TYPE_HEADER
+        } else {
+            VIEW_TYPE_ITEM
         }
     }
 
