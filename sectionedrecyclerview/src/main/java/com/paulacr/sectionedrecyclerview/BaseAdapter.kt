@@ -4,10 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.paulacr.sectionedrecyclerview.common.BaseViewHolder
+import com.paulacr.sectionedrecyclerview.common.buildListWithHeaders
 import com.paulacr.sectionedrecyclerview.databinding.ItemHeaderBinding
 import com.paulacr.sectionedrecyclerview.databinding.ItemListBinding
 import com.paulacr.sectionedrecyclerview.header.Header
 import com.paulacr.sectionedrecyclerview.listitem.ListItem
+import com.squareup.picasso.Picasso
 
 const val VIEW_TYPE_HEADER = 0
 const val VIEW_TYPE_ITEM = 1
@@ -18,23 +20,16 @@ class BaseAdapter(
 ) :
     RecyclerView.Adapter<BaseViewHolder<*>>() {
 
-    data class ListItemWithHeader(val listItem: ListItem, val isHeader: Boolean? = false)
+    private val newList: MutableList<ListItem> = mutableListOf()
 
-    private val newList: MutableList<ListItemWithHeader> = mutableListOf()
+    private data class ListWithHeader(val listItem: List<ListItem>, val isHeader: Boolean)
 
     init {
         setupList()
     }
 
     private fun setupList() {
-        items.groupBy {
-            it.listItemType
-        }.onEach {
-            newList.add(ListItemWithHeader(ListItem(listItemType = it.key), true))
-            it.value.map { listItem ->
-                newList.add(ListItemWithHeader(listItem))
-            }
-        }
+        newList.buildListWithHeaders(items)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): BaseViewHolder<*> {
@@ -50,17 +45,14 @@ class BaseAdapter(
 
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         val item = newList[position]
-
         if (getItemViewType(position) == VIEW_TYPE_HEADER) {
-            item.listItem.listItemType.header?.let { (holder as HeaderViewHolder).bind(it) }
+            (holder as HeaderViewHolder).bind(item.header)
         } else {
             (holder as ListItemViewHolder).apply {
                 itemView.setOnClickListener {
-                    item.listItem.let {  listItem ->
-                        clickListener(listItem)
-                    }
+                    clickListener(item)
                 }
-            }.bind(item.listItem)
+            }.bind(item)
         }
     }
 
@@ -68,7 +60,7 @@ class BaseAdapter(
 
     override fun getItemViewType(position: Int): Int {
 
-        return if (newList[position].isHeader == true) {
+        return if (newList[position].title.isNullOrEmpty()) {
             VIEW_TYPE_HEADER
         } else {
             VIEW_TYPE_ITEM
@@ -88,9 +80,7 @@ class BaseAdapter(
         BaseViewHolder<ListItem>(binding) {
 
         override fun bind(item: ListItem) {
-//            binding.itemImage.setime = item.imageRes
-            //glide
-
+            Picasso.get().load(item.imageRes).into(binding.itemImage)
             binding.itemTitle.text = item.title
             binding.itemLocation.text = item.location
             binding.executePendingBindings()

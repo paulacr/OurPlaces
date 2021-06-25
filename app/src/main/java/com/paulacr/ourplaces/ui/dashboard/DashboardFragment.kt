@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.paulacr.ourplaces.databinding.FragmentDashboardBinding
 import com.paulacr.sectionedrecyclerview.BaseAdapter
+import com.paulacr.sectionedrecyclerview.common.MultiHeadersDivider
 
 class DashboardFragment : Fragment() {
 
@@ -36,6 +37,7 @@ class DashboardFragment : Fragment() {
         dashboardViewModel.items.observe(
             viewLifecycleOwner,
             Observer {
+                rvDashboard.addItemDecoration(MultiHeadersDivider(rvDashboard.context, items = it))
                 rvDashboard.layoutManager = LinearLayoutManager(context)
                 rvDashboard.adapter = BaseAdapter(items = it) {}
             }
